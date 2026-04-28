@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "algoverse",
   "private": true,
   "version": "0.0.0",
   "engines": {
@@ -7,10 +7,10 @@
   },
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "dev": "cd frontend && vite",
+    "build": "cd frontend && tsc -b && vite build",
+    "lint": "cd frontend && eslint .",
+    "preview": "cd frontend && vite preview"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
