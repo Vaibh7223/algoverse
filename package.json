@@ -2,13 +2,10 @@
   "name": "algoverse",
   "private": true,
   "version": "0.0.0",
-  "engines": {
-    "node": ">=22.0.0"
-  },
   "type": "module",
   "scripts": {
     "dev": "cd frontend && vite",
-    "build": "cd frontend && tsc -b && vite build",
+    "build": "cd frontend && npx tsc -b && npx vite build",
     "lint": "cd frontend && eslint .",
     "preview": "cd frontend && vite preview"
   },

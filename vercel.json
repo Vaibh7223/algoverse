@@ -1,27 +1,14 @@
 {
-  "version": 2,
-  "builds": [
+  "buildCommand": "cd frontend && npx tsc -b && npx vite build",
+  "outputDirectory": "frontend/dist",
+  "rewrites": [
     {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "source": "/api/(.*)",
+      "destination": "/backend/api/index.js"
     },
     {
-      "src": "backend/package.json",
-      "use": "@vercel/node"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/backend/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
-    }
-  ],
-  "outputDirectory": "frontend/dist"
+  ]
 }

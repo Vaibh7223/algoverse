@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import {
   Activity, Brain, Code2, LayoutDashboard, Video, BookOpen,
-  Swords, Target, Database, Layers, ShieldAlert, Cpu,
+  Swords, Database, Layers, ShieldAlert, Cpu,
   UserCircle, ClipboardList, Lightbulb
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,7 +13,6 @@ import CoursePlayer from './pages/CoursePlayer';
 import AIChatbot from './components/AIChatbot';
 import AlgorithmDetail from './pages/AlgorithmDetail';
 import Battle from './pages/Battle';
-import Interview from './pages/Interview';
 import Landing from './pages/Landing';
 import Profile from './pages/Profile';
 import Assessment from './pages/Assessment';
@@ -69,8 +68,7 @@ const NAV_ITEMS = [
 ];
 
 const BONUS_ITEMS = [
-  { to: '/battle',    label: 'Algorithm Battle', icon: <Swords className="w-5 h-5" />,  hoverColor: 'hover:text-rose-400',   iconHover: 'group-hover:text-rose-400'  },
-  { to: '/interview', label: 'Interview Mode',   icon: <Target className="w-5 h-5" />,  hoverColor: 'hover:text-emerald-400',iconHover: 'group-hover:text-emerald-400'},
+  { to: '/battle', label: 'Algorithm Battle', icon: <Swords className="w-5 h-5" />, hoverColor: 'hover:text-rose-400', iconHover: 'group-hover:text-rose-400' },
 ];
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
@@ -404,7 +402,6 @@ function AppShell({ user, onLogout }: { user: AlgoUser; onLogout: () => void }) 
               <Route path="/courses"     element={<Courses />} />
               <Route path="/courses/:id" element={<CoursePlayer />} />
               <Route path="/battle"      element={<Battle />} />
-              <Route path="/interview"   element={<Interview />} />
               <Route path="/assessment"  element={<Assessment user={user} />} />
               <Route path="/assignment"  element={<Assignment />} />
               <Route path="/profile"     element={<Profile user={user} onLogout={onLogout} />} />

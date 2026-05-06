@@ -16,14 +16,46 @@ export default function SortingVisualizer({ algoName = 'Merge Sort', dataSize = 
   const [speedMs, setSpeedMs] = useState(300);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [manualInput, setManualInput] = useState('');
+  const [inputError, setInputError] = useState('');
 
   const parseManualArray = () => {
-    if (!manualInput) return;
-    const newArr = manualInput.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
-    if (newArr.length > 0) {
-      setArray(newArr);
-      setManualInput('');
+    if (!manualInput.trim()) {
+      setInputError('Please enter some values');
+      return;
     }
+    
+    // Support both space and comma-separated values
+    const newArr = manualInput
+      .split(/[\s,]+/)
+      .map(s => s.trim())
+      .filter(s => s)
+      .map(s => {
+        const num = parseInt(s);
+        return isNaN(num) ? null : num;
+      })
+      .filter((n): n is number => n !== null);
+    
+    if (newArr.length === 0) {
+      setInputError('No valid numbers found. Please enter numbers only.');
+      setTimeout(() => setInputError(''), 3000);
+      return;
+    }
+
+    if (newArr.length > 50) {
+      setInputError('Too many values! Maximum 50 values allowed.');
+      setTimeout(() => setInputError(''), 3000);
+      return;
+    }
+
+    if (newArr.some(n => n < 1 || n > 100)) {
+      setInputError('All values must be between 1 and 100.');
+      setTimeout(() => setInputError(''), 3000);
+      return;
+    }
+
+    setArray(newArr);
+    setManualInput('');
+    setInputError('');
   };
 
 
@@ -95,33 +127,63 @@ export default function SortingVisualizer({ algoName = 'Merge Sort', dataSize = 
 
   return (
     <div className="flex flex-col h-full gap-6">
-      <div className="flex items-center justify-between glass-panel p-4">
-        <div>
-           <h3 className="text-xl font-bold text-white mb-1">{algoName} Validation</h3>
-           <p className="text-slate-400 text-sm">{currentStep.message || "Press play to start"}</p>
+      <div className="glass-panel p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+             <h3 className="text-xl font-bold text-white mb-1">{algoName} Visualization</h3>
+             <p className="text-slate-400 text-sm">{currentStep.message || "Press play to start"}</p>
+          </div>
         </div>
 
-        <div className="flex gap-4 items-center">
-          <div className="flex bg-slate-900 border border-slate-700 rounded-lg overflow-hidden h-9">
-            <input 
-              type="text" 
-              value={manualInput} 
-              onChange={e => setManualInput(e.target.value)} 
-              placeholder="e.g. 38, 27, 43, 3"
-              className="bg-transparent text-white text-xs px-3 focus:outline-none w-36"
-              onKeyDown={e => e.key === 'Enter' && parseManualArray()}
-            />
-            <button onClick={parseManualArray} className="px-3 bg-indigo-500/20 text-indigo-300 text-xs font-bold hover:bg-indigo-500/40 transition-colors border-l border-slate-700">Set</button>
+        {/* Custom Values Input Section */}
+        <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/30 rounded-xl p-4 mb-4">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-indigo-300">📊 Enter Custom Values</span>
+              <span className="text-xs text-slate-400">({array.length} {array.length === 1 ? 'value' : 'values'})</span>
+            </div>
+            <div className="flex gap-2 items-stretch">
+              <input 
+                type="text" 
+                value={manualInput} 
+                onChange={e => setManualInput(e.target.value)} 
+                placeholder="e.g. 32 40 50 60 or 32, 40, 50, 60"
+                className={`flex-1 bg-slate-900/50 border rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:ring-1 transition-all placeholder-slate-500 ${
+                  inputError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-700 focus:border-indigo-500 focus:ring-indigo-500'
+                }`}
+                onKeyDown={e => e.key === 'Enter' && parseManualArray()}
+              />
+              <button 
+                onClick={parseManualArray} 
+                className="px-6 py-2 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold text-sm rounded-lg transition-all active:scale-95"
+              >
+                Set Array
+              </button>
+            </div>
+            {inputError && (
+              <p className="text-xs text-red-400 flex items-center gap-1">
+                ⚠️ {inputError}
+              </p>
+            )}
+            {!inputError && (
+              <p className="text-xs text-slate-400">💡 Tip: Separate values with spaces or commas. Values should be 1-100. Max 50 values.</p>
+            )}
           </div>
-          <button onClick={handleReset} className="text-xs text-slate-400 hover:text-white underline decoration-dashed underline-offset-4">Random Data</button>
+        </div>
 
-          <label className="text-slate-400 text-sm flex items-center gap-2 ml-4">
+        {/* Controls Row */}
+        <div className="flex gap-4 items-center justify-between">
+          <div className="flex gap-2">
+            <button onClick={handleReset} className="text-xs text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-lg transition-colors underline decoration-dashed underline-offset-2">Random Data</button>
+          </div>
+
+          <label className="text-slate-300 text-sm flex items-center gap-3 bg-slate-800/50 px-4 py-2 rounded-lg">
             Speed: 
             <input 
                type="range" min="10" max="1000" step="10" 
                value={1010 - speedMs} 
                onChange={(e) => setSpeedMs(1010 - parseInt(e.target.value))}
-               className="accent-indigo-500 w-24 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer"
+               className="accent-indigo-500 w-24 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer"
             />
           </label>
         </div>
@@ -132,7 +194,24 @@ export default function SortingVisualizer({ algoName = 'Merge Sort', dataSize = 
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 mix-blend-overlay pointer-events-none"></div>
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none"></div>
         
-        <div className="relative z-10 flex items-end justify-center w-full h-full gap-1 md:gap-2">
+        {/* Value Display Above Bars */}
+        <div className="relative z-20 mb-2 flex items-end justify-center w-full h-12 gap-1 md:gap-2 px-2">
+          <AnimatePresence>
+            {currentStep.array.map((val, idx) => {
+              return (
+                <motion.div
+                  key={`label-${idx}`}
+                  initial={false}
+                  className="flex-1 flex items-center justify-center text-[10px] md:text-xs font-bold text-slate-300 h-full"
+                >
+                  <span>{val}</span>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </div>
+
+        <div className="relative z-10 flex items-end justify-center w-full flex-1 gap-1 md:gap-2">
           <AnimatePresence>
             {currentStep.array.map((val, idx) => {
               const heightPercentage = `${val}%`;
@@ -157,13 +236,13 @@ export default function SortingVisualizer({ algoName = 'Merge Sort', dataSize = 
 
               return (
                 <motion.div
-                  key={idx} // NOTE: For realistic element swaps, value/id based keys are better, but MergeSort changes array deeply. Indices work fine if we do simple height changing.
+                  key={idx}
                   initial={false}
                   animate={{ height: heightPercentage }}
                   transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                  className={`w-4 md:w-12 rounded-t-sm shadow-lg ${barColor} ${shadow} flex items-end justify-center pb-2 transition-colors duration-200`}
+                  className={`w-4 md:w-12 rounded-t-sm shadow-lg ${barColor} ${shadow} flex items-end justify-center pb-2 transition-colors duration-200 min-h-[20px]`}
+                  title={`Value: ${val}`}
                 >
-                  <span className="text-[10px] font-bold text-slate-900 md:block hidden">{val}</span>
                 </motion.div>
               );
             })}
